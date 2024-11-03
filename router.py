@@ -7,5 +7,5 @@ pages = {
     ],
 }
 
-pg = st.navigation(pages)
+pg = st.navigation(pages=pages, expanded=False)
 pg.run()
