@@ -2,3 +2,7 @@ data/
 uv.lock
 .venv/
 env/
+multilingual-e5-large-instruct
+__pycache__/
+__pycache__/**
+*/__pycache__/

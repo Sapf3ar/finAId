@@ -23,6 +23,7 @@ class RagQuery:
 
 def llm_response(
     prompt: str,
+    agent_manager,
 ) -> dict[str, (List[int] | List[str] | pd.DataFrame)]:
     financials: dict[str, int | float] = {
         "общие_обязательства": 1000000,  # total_liabilities
@@ -74,7 +75,7 @@ def llm_response(
     output = {"data": pd.concat(frames)}
     relevant_metrics: List[str] = ["цена_акции", "выручка_за_прошлый_год"]
     plots: List[int] = [0, 2]
-    text: List[str] = ["Of course! Here is..."]
+    text: List[str] = [agent_manager.get_RAG_response("Name bobik")]
     output["base_metrics"] = relevant_metrics
     output["base_plots"] = plots
     output["text"] = text
@@ -111,9 +112,9 @@ def parse_plots(query: RagQuery) -> RagQuery:
     return query
 
 
-def get_rag(query: RagQuery) -> RagQuery:
+def get_rag(query: RagQuery, agent_manager) -> RagQuery:
     query.metrics = parse_metrics(query)
-    output = llm_response(query.prompt)
+    output = llm_response(query.prompt, agent_manager=agent_manager)
     query.data = output["data"]
     query.companies = query.data.comp.unique().tolist()
     query.text_output = output["text"]

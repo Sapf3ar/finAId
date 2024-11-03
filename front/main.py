@@ -2,6 +2,8 @@ import streamlit as st
 from functools import partial
 import time
 from rag.helper import process_prompt, get_rag, RagQuery
+from agents.agent import AgentManager, LLMClient
+import json
 
 st.set_page_config(
     page_title="finance AId",
@@ -17,7 +19,21 @@ st.markdown(
     "<h2 style='text-align: center; color: black;'>FinAId: ваша суперсила в анализе документов</h1>",
     unsafe_allow_html=True,
 )
+def state_filler(key, value):
+    if key not in st.session_state:
+        st.session_state[key] = value
 
+@st.cache_resource
+def init_agent():
+    if "agent_manager" not in st.session_state:
+        with open('prompts/prompts.json', 'r') as f:
+            prompts = json.load(f)
+        with open('data/filled_metric_database.json', 'r') as f:
+            filled_metric_database = json.load(f)
+    
+        st.session_state["agent_manager"] = AgentManager(prompt_dict=prompts, financials=filled_metric_database['2015'], llm_client=LLMClient)
+
+init_agent()
 
 def colorize_multiselect_options(colors: list[str]) -> None:
     rules = ""
@@ -29,9 +45,7 @@ def colorize_multiselect_options(colors: list[str]) -> None:
     st.markdown(f"<style>{rules}</style>", unsafe_allow_html=True)
 
 
-def state_filler(key, value):
-    if key not in st.session_state:
-        st.session_state[key] = value
+
 
 
 year_color = "#FFA07A"  # Light salmon for years
@@ -63,7 +77,7 @@ _init_state()
 
 def send_prompt():
     prompt = st.session_state["prompt_input"]
-    prompt = get_rag(RagQuery(prompt=prompt, profiles=st.session_state["profile"]))
+    prompt = get_rag(RagQuery(prompt=prompt, profiles=st.session_state["profile"]), agent_manager = st.session_state["agent_manager"])
     st.session_state["rag_response"] = prompt
     st.session_state["base_rag_response"] = partial(process_prompt, prompt)
 
