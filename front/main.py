@@ -31,7 +31,7 @@ def init_agent():
         with open('data/filled_metric_database.json', 'r') as f:
             filled_metric_database = json.load(f)
     
-        st.session_state["agent_manager"] = AgentManager(prompt_dict=prompts, financials=filled_metric_database['2015'], llm_client=LLMClient)
+        st.session_state["agent_manager"] = AgentManager(prompt_dict=prompts, financials=filled_metric_database['2015'], llm_client=LLMClient())
 
 init_agent()
 

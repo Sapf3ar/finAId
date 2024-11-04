@@ -39,7 +39,7 @@ def single_bar(data: pd.DataFrame, x, y, title, company_column=None):
         y=y,
         color=company_column,
         barmode="group",
-        title=f"Company Performance Comparison on {y}",
+        title=f"Изменения метрики {y}",
         color_discrete_sequence=colors,
         labels={x: y},
     )

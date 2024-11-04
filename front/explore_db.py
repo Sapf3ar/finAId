@@ -1,2 +1,2 @@
-def fuckyou():
+def mock():
     return True

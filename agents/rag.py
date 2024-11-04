@@ -25,7 +25,6 @@ class RagClass:
         
         self.device = 'cuda:0' if torch.cuda.is_available() else 'cpu'
         self.model = SentenceTransformer(model_name).to(self.device)
-        # self.model = None
         
         if vector_db_path is None:
             collection = self._init_faiss_db(
@@ -107,7 +106,7 @@ class RagClass:
 
     
     def reload_vector_db(self, path: str = 'faiss-db/'):
-        vector_store = FAISS.load_local(folder_path=path, embeddings=self._function_for_embeddings_2)
+        vector_store = FAISS.load_local(folder_path=path, embeddings=self._function_for_embeddings)
         print("Succecfully loaded vector data base")
         return vector_store
 
@@ -123,7 +122,7 @@ class RagClass:
         path = 'faiss-db/',
         name = "mts-doc-db"
         ):
-        embed_func = self._function_for_embeddings_2
+        embed_func = self._function_for_embeddings
         
         index = faiss.IndexFlatL2(1024)
 
@@ -169,7 +168,29 @@ class RagClass:
         print(f"Successfully loaded {len(csv_table)} documents")
         return collection
     
-    def _ask_llm(self, question):
+    def _ask_llm(self, question: str = "Hello, name three president in US") -> str:
+        img_extra = {
+                "model": "meta-llama/Llama-3.2-11B-Vision-Instruct",
+                "add_special_tokens": True,
+                "messages": [
+                    {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"{question}"
+                        }
+                        ]
+                    }
+                ]
+        }
+        
+        resp = requests.post(url,
+                            json=img_extra
+                            )
+        return resp.json()['choices'][0]['message']['content']
+    
+    def _ask_llm_gpt(self, question):
         response = client.chat.completions.create(
             model="gpt-4o-mini",  # Указываем модель
             messages=[

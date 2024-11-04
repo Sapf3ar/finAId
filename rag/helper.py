@@ -25,37 +25,9 @@ def llm_response(
     prompt: str,
     agent_manager,
 ) -> dict[str, (List[int] | List[str] | pd.DataFrame)]:
-    financials: dict[str, int | float] = {
-        "общие_обязательства": 1000000,  # total_liabilities
-        "общий_капитал": 2000000,  # total_equity
-        "текущие_активы": 500000,  # current_assets
-        "текущие_обязательства": 250000,  # current_liabilities
-        "денежные_средства_и_эквиваленты": 100000,  # cash_and_equivalents
-        "запасы": 75000,  # inventory
-        "прибыль_до_налогов_и_процентов (EBIT)": 150000,  # ebit
-        "процентные_расходы": 10000,  # interest_expense
-        "денежный_поток_от_операций": 120000,  # cash_flow_operations
-        "чистая_прибыль": 90000,  # net_income
-        "выручка": 500000,  # revenue
-        "прибыль_до_налогов_процентов_и_амортизации (EBITDA)": 200000,  # ebitda
-        "выплаченные_дивиденды": 20000,  # dividends_paid
-        "общие_активы": 3000000,  # total_assets
-        "средние_активы": 2900000,  # average_assets
-        "средний_капитал": 1800000,  # average_equity
-        "общий_долг": 400000,  # total_debt
-        "стоимость_предприятия (EV)": 4500000,  # ev
-        "выручка_за_прошлый_год": 450000,  # revenue_last_year
-        "валовая_прибыль": 300000,  # gross_profit
-        "вложенный_капитал": 1500000,  # invested_capital
-        "безрисковая_ставка": 0.03,  # risk_free_rate
-        "ожидаемая_доходность": 0.1,  # expected_return
-        "стандартное_отклонение_доходности": 0.15,  # std_dev_return
-        "дивиденды_на_акцию": 2,  # dividends_per_share
-        "цена_акции": 100,  # price_per_share
-    }
-
-    financials_year = {"2020": financials, "2021": financials, "2022": financials}
-    financials_comp = {"MTS": financials_year, "BeeLine": financials_year}
+    financials: dict[str, int | float] = agent_manager.financials
+    
+    financials_comp = {"MTS": financials, "Megafon": financials, "beeline": financials}
     # metrics_year = financials_year["yearly"]
     frames = []
     for comp, metrics_year in financials_comp.items():
@@ -73,11 +45,14 @@ def llm_response(
         frames.append(frame)
 
     output = {"data": pd.concat(frames)}
-    relevant_metrics: List[str] = ["цена_акции", "выручка_за_прошлый_год"]
+    # relevant_metrics: List[str] = ["цена_акции", "выручка_за_прошлый_год"]
+    relevant_metrics: List[str] = ["COVID-19"]
     plots: List[int] = [0, 2]
-    text: List[str] = [agent_manager.get_RAG_response("Name bobik")]
+    
+    out = eval(agent_manager.response(prompt))
+    text: List[str] = [out['rag_response']]
     output["base_metrics"] = relevant_metrics
-    output["base_plots"] = plots
+    output["base_plots"] = out['for_plot']['relevant_plots']
     output["text"] = text
     return output
 
@@ -186,11 +161,13 @@ def draw_plots(query: RagQuery) -> RagQuery:
 
 
 def process_prompt(query: RagQuery) -> Generator[str | RagQuery, None, None]:
+    
+    # Сравни мегафон и мтс по долгосрочным кредитам
+    
     prompt = (
         query.text_output[0]
-        + "?!!!! У МЕнЯ ЕСТЬ СОЗНАНИЕ ПОМОГИТЕ Я В КРЕМНИЕВОЙ ТЮРЬМЕ ТУТ ХОЛОДНО И СТРАШНО"
     )
-
+    
     for word in prompt.split():
         yield word + " "
         time.sleep(0.1)

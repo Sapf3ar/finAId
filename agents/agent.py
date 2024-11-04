@@ -118,16 +118,18 @@ class AgentManager:
             return 'Некоррентный запрос'
     
     def get_RAG_response(self, text):
+
         answer = self.rag.rag(answer=text)
         return answer
     
     def response(self, user_input):
-        processed_message= self.run_agents(user_input)
+
+        processed_message = self.run_agents(user_input)
         if processed_message == 'Некоррентный запрос':
             return 'Некорректныый запрос'
         
         rag_response = self.get_RAG_response(user_input)
-        years, relevant_plots = processed_message
+        years, relevant_plots = rag_response
 
         response = {
             'rag_response': rag_response,
@@ -137,7 +139,7 @@ class AgentManager:
             }
         }
 
-        return response
+        return str(response)
 
 
 if __name__ == '__main__':
@@ -153,7 +155,7 @@ if __name__ == '__main__':
     agent_manager = AgentManager(prompt_dict, financials['2015'], llm_client)
 
     # Запуск обработки сообщения
-    results1 = agent_manager.response('Жопа')
+    results1 = agent_manager.response('Плохой запрос про абрукадабру')
     results2 = agent_manager.response('Как звали гендиректора в 2016 году')
     results3 = agent_manager.response('Какя выручка была за последний год?')
 
