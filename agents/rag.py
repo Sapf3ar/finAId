@@ -1,4 +1,5 @@
 # RAG
+import os
 import pandas as pd
 import requests
 import json
@@ -17,8 +18,8 @@ import torch
 from openai import OpenAI
 
 url = "https://innoglobalhack-general.olymp.innopolis.university/v1/chat/completions"
-model_name = "multilingual-e5-large-instruct/"
-
+model_name ="embaas/sentence-transformers-e5-large-v2"
+client = OpenAI(api_key=os.getenv["API_KEY"], base_url="https://openai-proxy-vercel-gamma.vercel.app/v1/")
 
 class RagClass:
     def __init__(self, table_path: str = 'df_rag_year.csv', vector_db_path: str = None) -> None:

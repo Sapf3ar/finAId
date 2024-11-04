@@ -25,17 +25,35 @@ def llm_response(
     prompt: str,
     agent_manager,
 ) -> dict[str, (List[int] | List[str] | pd.DataFrame)]:
-    financials: dict[str, int | float] = agent_manager.financials
+    """ 
+    Response type:
+    [
+    {
+        "Company": {
+                    "Year": {
+                        "Metric_name":metric_value
+                        }
+                    }
+    },
+    {
+        "Tags": {"metric_names":["metric_1", "metric_2"]},
+        "Text":["Text output from llm"]
+    }
+    ]
+    """
+
+    financials_per_comp: dict[str, int | float] = agent_manager.financials
     
-    financials_comp = {"MTS": financials, "Megafon": financials, "beeline": financials}
     # metrics_year = financials_year["yearly"]
     frames = []
+
     for comp, metrics_year in financials_comp.items():
         base_dict = {}
         base_dict["year"] = []
-        for key, value in metrics_year.items():
-            base_dict["year"].append(key)
-            for k, v in value.items():
+        for year, metrics in metrics_year.items():
+            base_dict["year"].append(year)
+            
+            for k, v in metrics.items():
                 cur_metric = base_dict.get(k, [])
                 cur_metric.append(v)
                 base_dict[k] = cur_metric
